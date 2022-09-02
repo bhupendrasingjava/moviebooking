@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.movie.entity.MovieEntity;
 import com.movie.repository.MovieRepository;
+import com.movie.service.MovieService;
 
 @RestController
 @RequestMapping("/movie")
@@ -26,23 +27,26 @@ public class MovieController {
 	@Autowired
 	private MovieRepository repository;
 
+	@Autowired
+	private MovieService movieService;
+	
 	@PostMapping("/saveMovie")
 	public MovieEntity saveMovie(@RequestBody MovieEntity movie) {
-		MovieEntity saveMovie = repository.save(movie);
+		MovieEntity saveMovie = movieService.saveMovie(movie);
 		return saveMovie;
 
 	}
 
 	@GetMapping("/getMovie")
 	public List<MovieEntity> movieList() {
-		List<MovieEntity> findAll = repository.findAll();
+		List<MovieEntity> findAll = movieService.movieList();
 		return findAll;
 	}
 
 	@PutMapping("/updateMovie")
 	public MovieEntity updateMovie(@RequestBody MovieEntity movie) {
-		MovieEntity saveAndFlush = repository.saveAndFlush(movie);
-		return saveAndFlush;
+		MovieEntity updatedMovie = movieService.updateMovie(movie);
+		return updatedMovie;
 	}
 
 	@DeleteMapping("/deleteMovie")
