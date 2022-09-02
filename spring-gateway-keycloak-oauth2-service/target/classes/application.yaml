@@ -1,0 +1,66 @@
+spring:
+  application: 
+    name: api-gateway-service
+  cloud:
+    gateway:
+      default-filters:
+        - TokenRelay
+      routes:
+      - id: movieModule
+        uri: lb://movie-service
+        predicates:
+        - Path=/movie/**
+      - id: theaterModule
+        uri: lb://theater-service
+        predicates:
+        - Path=/theater/**
+      - id: bookingModule
+        uri: lb://booking-service
+        predicates:
+        - Path=/booking/**
+  security:
+    oauth2:
+      client:
+        provider:
+          my-keycloak-provider:
+            issuer-uri: http://localhost:8080/auth/realms/My-Realm
+            # Individual properties can also be provided this way
+#            token-uri: http://localhost:8080/auth/realms/amrutrealm/protocol/openid-connect/token
+#            authorization-uri: http://localhost:8080/auth/realms/amrutrealm/protocol/openid-connect/auth
+#            userinfo-uri: http://localhost:8080/auth/realms/amrutrealm/protocol/openid-connect/userinfo
+#            user-name-attribute: preferred_username
+        registration:
+          keycloak-spring-gateway-client:
+            provider: my-keycloak-provider
+            scope: openid
+            client-id: spring-gateway-client
+            client-secret: 3RhEF8pqKTANrQ6BhfxaYVmcjTXsDK0u
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
+
+# Enable these to debug the Authorization flow
+logging:
+    level:
+      org:
+        springframework:
+          security:
+            web: DEBUG
+server:
+  port: 7000
+
+        
+eureka:
+  server:
+    peer-node-read-timeout-ms: 25000
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka        
+      
+management:
+    endpoint:
+        health:
+            show-details: always
+    endpoints:
+        web:
+            exposure:
+                include: '*'          

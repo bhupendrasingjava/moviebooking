@@ -1,0 +1,27 @@
+server:
+  port: 8761
+
+eureka:
+  client:
+    registerWithEureka: false
+    fetchRegistry: false
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+      
+      
+logging:
+    level:
+        com:
+            eserver: DEBUG
+        root: WARN    
+    file:     
+      name: 'E:/movie-app-logs/logs/elk/elk-stack.log'
+            
+management:
+    endpoint:
+        health:
+            show-details: always
+    endpoints:
+        web:
+            exposure:
+                include: '*'      

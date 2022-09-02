@@ -1,0 +1,62 @@
+server: 
+  port: 8083
+spring: 
+  application: 
+    name: booking-service
+  zipkin:
+    enabled: true    
+  datasource: 
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    password: root
+    url: "jdbc:mysql://localhost:3306/movies?createDatabaseIfNotExist=true"
+    username: root
+  jpa: 
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    generate-ddl: true
+    hibernate: 
+      ddl-auto: update
+  session: 
+    jdbc: 
+      initialize-schema: always
+    store-type: jdbc
+    timeout: 
+      seconds: 10000
+      
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka   
+      
+logging:
+    level:
+        com:
+            booking: DEBUG
+        root: WARN    
+    file:     
+      name: 'E:/movie-app-logs/logs/elk/elk-stack.log'     
+ 
+resilience4j:
+  circuitbreaker:
+    instances:
+      orderService:
+        registerHealthIndicator: true
+        eventConsumerBufferSize: 10
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        failureRateThreshold: 50
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        slidingWindowSize: 10
+        waitDurationInOpenState: 5s
+        slidingWindowType: COUNT_BASED
+              
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+    endpoint:
+        health:
+            show-details: always
+    endpoints:
+        web:
+            exposure:
+                include: '*'          
