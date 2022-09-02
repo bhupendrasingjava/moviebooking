@@ -37,7 +37,8 @@ public class MovieServiceImpl implements MovieService {
 	@Override
 	public String deleteMovie(long id) {
 		// TODO Auto-generated method stub
-		return null;
+		movieRepository.deleteById(id);
+		return "Success";
 	}
 
 	@Override

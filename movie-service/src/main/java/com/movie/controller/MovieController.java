@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.movie.entity.MovieEntity;
-import com.movie.repository.MovieRepository;
 import com.movie.service.MovieService;
 
 @RestController
@@ -24,9 +24,6 @@ public class MovieController {
 
 	private static final Logger log = LoggerFactory.getLogger(MovieController.class);
 	
-	@Autowired
-	private MovieRepository repository;
-
 	@Autowired
 	private MovieService movieService;
 	
@@ -52,15 +49,14 @@ public class MovieController {
 	@DeleteMapping("/deleteMovie")
 	public String deleteMovie(@RequestParam(value = "id", required = true) long id) {
 
-		repository.deleteById(id);
+		return movieService.deleteMovie(id);
 
-		return "Success";
 	}
 
 	@GetMapping("/getMovieById")
 	public MovieEntity getMovieById(@RequestParam(value = "id", required = true) long id) {
 		log.info("Inside MovieController: getMovieById()");
-		Optional<MovieEntity> movieEntity = repository.findById(id);
+		Optional<MovieEntity> movieEntity = movieService.getMovieById(id);
 		log.debug("MovieController: getMovieById() calles successfully");
 		return movieEntity.get();
 	}
