@@ -1,0 +1,132 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: movie-service
+  labels:
+    app: movie-service
+    component: movie-service
+  namespace: test-dev
+data:
+  application.yml: |-
+    server: 
+  port: 8082
+spring: 
+  application: 
+    name: movie-service
+  zipkin:
+    enabled: true    
+  datasource: 
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    password: root
+    url: "jdbc:mysql://localhost:3306/movie?createDatabaseIfNotExist=true"
+    username: root
+  jpa: 
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    generate-ddl: true
+    hibernate: 
+      ddl-auto: update
+  session: 
+    jdbc: 
+      initialize-schema: always
+    store-type: jdbc
+    timeout: 
+      seconds: 10000
+  
+eureka:
+  server:
+    peer-node-read-timeout-ms: 25000
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka           
+      
+logging:
+    level:
+        com:
+            movie: DEBUG
+        root: WARN    
+    file:     
+      name: 'E:/movie-app-logs/logs/elk/elk-stack.log'
+      
+management:
+  endpoint:
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: prometheus      
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: movie-service
+  namespace: test-dev
+spec:
+  selector:
+    matchLabels:
+      app: movie-service
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: movie-service
+        owner: boking
+    spec:
+      volumes:
+      - name: movie-service
+        configMap:
+          name: movie-service
+          items:
+          - key: application.yml
+            path: application.yml
+      imagePullSecrets:
+      - name: gitlab
+      containers:
+      - name: movie-service
+        image: ${image_path}:${RELEASE_NUMBER}
+        volumeMounts:
+        - name: user-management
+          mountPath: /app/configs/application.yml
+          subPath: application.yml
+        ports:
+        - containerPort: 8082
+        livenessProbe:
+          httpGet:
+            path: /movie/healthz
+            port: 8082
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /movie/healthz
+            port: 8082
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 30
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 2Gi
+          requests:
+            cpu: 50m
+            memory: 100Mi
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: movie-service
+  namespace: test-dev
+spec:
+  selector:
+    app: movie-service
+  ports:
+  - protocol: TCP
+    port: 8082
+    targetPort: 8082
+

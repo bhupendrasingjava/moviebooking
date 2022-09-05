@@ -24,11 +24,6 @@ spring:
         provider:
           my-keycloak-provider:
             issuer-uri: http://localhost:8080/auth/realms/My-Realm
-            # Individual properties can also be provided this way
-#            token-uri: http://localhost:8080/auth/realms/amrutrealm/protocol/openid-connect/token
-#            authorization-uri: http://localhost:8080/auth/realms/amrutrealm/protocol/openid-connect/auth
-#            userinfo-uri: http://localhost:8080/auth/realms/amrutrealm/protocol/openid-connect/userinfo
-#            user-name-attribute: preferred_username
         registration:
           keycloak-spring-gateway-client:
             provider: my-keycloak-provider
@@ -57,10 +52,12 @@ eureka:
       defaultZone: http://localhost:8761/eureka        
       
 management:
-    endpoint:
-        health:
-            show-details: always
-    endpoints:
-        web:
-            exposure:
-                include: '*'          
+  endpoint:
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: prometheus          
